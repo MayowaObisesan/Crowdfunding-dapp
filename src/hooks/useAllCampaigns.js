@@ -5,11 +5,13 @@ import {
     getCrowdfundContract,
     getCrowdfundContractWithProvider,
 } from "../utils";
+import useCampaign from "./useCampaign";
 
 const useAllCampaigns = () => {
     const [campaigns, setCampaigns] = useState([]);
     const { provider } = useConnection();
     const campaignNo = useCampaignCount();
+    const { campaign } = useCampaign();
 
     useEffect(() => {
         const fetchAllCampaigns = async () => {
@@ -47,8 +49,29 @@ const useAllCampaigns = () => {
         fetchAllCampaigns();
 
         // Listen for event
-        const handleProposeCampaignEvent = (id, title, amount, duration) => {
-            console.log({ id, title, amount, duration });
+        const handleProposeCampaignEvent = async (id, title, amount, duration) => {
+            const newCampaign = {
+                id: Number(id),
+                title: title,
+                fundingGoal: amount,
+                owner: null,
+                durationTime: Number(duration),
+                isActive: true,
+                fundingBalance: 0,
+                contributors: [],
+            }
+
+            // Fetch the proposed campaign
+            // try {
+            //     const newCampaign = await campaign(Number(id));
+            //     console.log("Fetching new campaign");
+            //     console.log(newCampaign);
+            // } catch (err) {
+            //     console.log(err);
+            // }
+
+            // Update the campaign list, LIFO
+            setCampaigns(value => ([newCampaign, ...value]));
         };
 
         const contract = getCrowdfundContractWithProvider(provider);

@@ -1,9 +1,10 @@
 import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import useProposeCampaign from "../hooks/useProposeCampaign";
 import { useConnection } from "../context/connection";
 import { supportedChains } from "../constants";
 import { parseEther } from "ethers";
+import { getCrowdfundContractWithProvider } from "../utils";
 
 const CreateCampaign = () => {
     let [isOpen, setIsOpen] = useState(false);
@@ -11,9 +12,17 @@ const CreateCampaign = () => {
     const [goal, setGoal] = useState(0.5);
     const [duration, setDuration] = useState(1);
     const [sendingTx, setSendingTx] = useState(false);
-    const { connect, isActive, account, switchToChain } = useConnection();
+    const { connect, isActive, account, provider, switchToChain } = useConnection();
 
     const proposeCampaign = useProposeCampaign();
+
+    // useEffect(() => {
+    //     // Listen for event
+
+    //     return () => {
+    //         contract.off("ProposeCampaign", handleProposeCampaignEvent);
+    //     };
+    // }, []);
 
     function closeModal() {
         setIsOpen(false);
@@ -38,6 +47,14 @@ const CreateCampaign = () => {
             if (receipt.status === 0) return alert("tx failed");
 
             alert("campaign created!!");
+
+            // Reset the create campaign form
+            setTitle("");
+            setGoal("");
+            setDuration("");
+
+            // Close the form modal
+            closeModal();
         } catch (error) {
             console.log("error: ", error);
             if (error.info.error.code === 4001) {
@@ -48,6 +65,7 @@ const CreateCampaign = () => {
             setSendingTx(false);
         }
     };
+
     return (
         <Fragment>
             <button
