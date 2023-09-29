@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useConnection } from "../context/connection";
 import { calculateGasMargin, getCrowdfundContract } from "../utils";
 import useCampaignCount from "./useCampaignCount";
