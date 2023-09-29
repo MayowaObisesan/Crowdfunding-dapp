@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useCampaignCount from "./useCampaignCount";
 import { useConnection } from "../context/connection";
-import { getCrowdfundContract } from "../utils";
+import { getCrowdfundContract, getCrowdfundContractWithProvider } from "../utils";
 
 const useCampaign = (id) => {
     const [campaign, setCampaign] = useState(null);
@@ -19,6 +19,7 @@ const useCampaign = (id) => {
                 const contract = await getCrowdfundContract(provider, false);
 
                 const campaignStruct = await contract.crowd(campaignId);
+                const contributors = await contract.getContributors(campaignId);
 
                 const campaignDetails = {
                     id: campaignId,
@@ -28,7 +29,7 @@ const useCampaign = (id) => {
                     durationTime: Number(campaignStruct.durationTime),
                     isActive: campaignStruct.isActive,
                     fundingBalance: campaignStruct.fundingBalance,
-                    contributors: campaignStruct.contributors,
+                    contributors: contributors,
                 };
 
                 setCampaign(campaignDetails);
@@ -40,7 +41,34 @@ const useCampaign = (id) => {
         };
 
         fetchCampaign();
+
     }, [campaignLength, id, provider]);
+
+
+    useEffect(() => {
+        const handleContributeEthEvent = async (id) => {
+            const contributors = await contract.getContributors(id);
+            const latestCampaign = {
+                id: campaign.id,
+                title: campaign.title,
+                fundingGoal: campaign.fundingGoal,
+                owner: campaign.owner,
+                durationTime: Number(campaign.durationTime),
+                isActive: campaign.isActive,
+                fundingBalance: campaign.fundingBalance,
+                contributors: contributors,
+            }
+            setCampaign(latestCampaign);
+        }
+        const contract = getCrowdfundContractWithProvider(provider);
+        contract.on("ContributeEth", handleContributeEthEvent);
+
+        return () => {
+            contract.off("ContributeEth", handleContributeEthEvent);
+        };
+    }, [campaign]);
+
+
     return { campaign, state };
 };
 

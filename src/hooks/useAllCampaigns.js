@@ -5,13 +5,12 @@ import {
     getCrowdfundContract,
     getCrowdfundContractWithProvider,
 } from "../utils";
-import useCampaign from "./useCampaign";
+// import useCampaign from "./useCampaign";
 
 const useAllCampaigns = () => {
     const [campaigns, setCampaigns] = useState([]);
     const { provider } = useConnection();
     const campaignNo = useCampaignCount();
-    const { campaign } = useCampaign();
 
     useEffect(() => {
         const fetchAllCampaigns = async () => {
@@ -24,8 +23,11 @@ const useAllCampaigns = () => {
                 const campaignPromises = campaignsKeys.map((id) =>
                     contract.crowd(id)
                 );
+                const contributorPromises = campaignsKeys.map(async (id) => Array.from(await contract.getContributors(id)));
 
                 const campaignResults = await Promise.all(campaignPromises);
+                const contributorsResults = await Promise.all(contributorPromises);
+                // console.log(contributorsResults);
 
                 const campaignDetails = campaignResults.map(
                     (details, index) => ({
@@ -36,7 +38,7 @@ const useAllCampaigns = () => {
                         durationTime: Number(details.durationTime),
                         isActive: details.isActive,
                         fundingBalance: details.fundingBalance,
-                        contributors: details.contributors,
+                        contributors: contributorsResults[index],
                     })
                 );
 

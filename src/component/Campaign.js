@@ -17,17 +17,19 @@ const Campaign = ({ campaign }) => {
                     <p className="mt-2 font-bold text-gray-500">
                         Balance - {formatEther(campaign?.fundingBalance)} ETH
                     </p>
+                    <p className="mt-2 font-bold text-gray-500">
+                        No of Contributors - {campaign?.contributors?.length}
+                    </p>
                 </div>
                 <div className="flex flex-col gap-3 px-6 pt-2 pb-2">
                     <span className="w-fit bg-blue-400 text-white text-sm px-4 py-2 rounded-full">
                         {formatEther(campaign?.fundingGoal)} ETH
                     </span>
                     <span
-                        className={`${
-                            campaign.isActive
-                                ? "bg-green-400 text-white"
-                                : "bg-red-400 text-white"
-                        } w-fit text-sm px-4 py-2 rounded-full`}
+                        className={`${campaign.isActive
+                            ? "bg-green-400 text-white"
+                            : "bg-red-400 text-white"
+                            } w-fit text-sm px-4 py-2 rounded-full`}
                     >
                         {campaign.isActive ? "Active" : "Inactive"}
                     </span>
