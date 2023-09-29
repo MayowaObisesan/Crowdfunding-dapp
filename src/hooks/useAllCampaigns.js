@@ -50,6 +50,7 @@ const useAllCampaigns = () => {
         const handleProposeCampaignEvent = (id, title, amount, duration) => {
             console.log({ id, title, amount, duration });
         };
+
         const contract = getCrowdfundContractWithProvider(provider);
         contract.on("ProposeCampaign", handleProposeCampaignEvent);
 
