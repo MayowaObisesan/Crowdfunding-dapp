@@ -8,6 +8,7 @@ const useCampaign = (id) => {
     const [state, setState] = useState("LOADING");
     const { provider } = useConnection();
     const campaignLength = useCampaignCount();
+    const [contributorCount, setContributorCount] = useState(0);
 
     useEffect(() => {
         const fetchCampaign = async () => {
@@ -19,7 +20,11 @@ const useCampaign = (id) => {
                 const contract = await getCrowdfundContract(provider, false);
 
                 const campaignStruct = await contract.crowd(campaignId);
-                const contributors = await contract.getContributors(campaignId);
+                const contributors = Array.from(await contract.getContributors(campaignId));
+                console.log(contributors);
+                console.log("Get contributors");
+                setContributorCount(contributors.length);
+                console.log(contributorCount);
 
                 const campaignDetails = {
                     id: campaignId,
@@ -48,6 +53,7 @@ const useCampaign = (id) => {
     useEffect(() => {
         const handleContributeEthEvent = async (id) => {
             const contributors = await contract.getContributors(id);
+            console.log(contributors);
             const latestCampaign = {
                 id: campaign.id,
                 title: campaign.title,
